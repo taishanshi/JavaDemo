@@ -1,0 +1,18 @@
+package expression;
+
+import java.util.Map;
+
+public class Or implements Expression {
+    private Expression left;
+    private Expression right;
+
+    public Or(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public boolean interpret(Map<String, Integer> context) {
+        return left.interpret(context) || right.interpret(context);
+    }
+}
