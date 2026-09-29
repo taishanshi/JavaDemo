@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.*;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.internal.operators.observable.ObservableCreate;
+import io.reactivex.rxjava3.internal.operators.observable.ObservableMap;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -59,24 +60,31 @@ public class RxJavaTest {
         };
 
 
-        ObservableCreate oc = new ObservableCreate<Integer>(oos);
-        oc.subscribe(new BaseObserver());
-        Observable.<Integer>create(emitter -> {
-                    System.out.println("源头开始，线程 " + threadName());
-                    for (int i = 1; i <= 3; i++) {
-                        System.out.println("源头发射 " + i + "，线程 " + threadName());
-                        emitter.onNext(i);
-                    }
-                    emitter.onComplete();
-                })                                    //返回ObservableCreate对                .subscribeOn(Schedulers.io())         //返回ObservableSubscribeOn对象， source 是ObservableCreate对象
-//                .map(value -> {
-//                    int mapped = value * 10;
-//                    System.out.println("map " + value + " -> " + mapped + "，线程 " + threadName());
-//                    return mapped;
-//                }) 象   source 是 ObservableEmitter <Integer> 对象
-//                                    //返回ObservableMap 实例， source是ObservableSubscribeOn 实例
-                //.observeOn(Schedulers.computation())   //返回ObservableObserveOn  source是返回ObservableMap 实例
-                .subscribe(new BaseObserver());
+        ObservableCreate<Integer> oc = new ObservableCreate<Integer>(oos);
+         oc.map(value -> {
+                    int mapped = value * 10;
+                    System.out.println("map " + value + " -> " + mapped + "，线程 " + threadName());
+                    return mapped;
+                })
+                 .observeOn(Schedulers.newThread())
+                 .subscribeOn(Schedulers.io())
+              .subscribe(new BaseObserver());
+//        Observable.<Integer>create(emitter -> {
+//                    System.out.println("源头开始，线程 " + threadName());
+//                    for (int i = 1; i <= 3; i++) {
+//                        System.out.println("源头发射 " + i + "，线程 " + threadName());
+//                        emitter.onNext(i);
+//                    }
+//                    emitter.onComplete();
+//                })                                    //返回ObservableCreate对                .subscribeOn(Schedulers.io())         //返回ObservableSubscribeOn对象， source 是ObservableCreate对象
+////                .map(value -> {
+////                    int mapped = value * 10;
+////                    System.out.println("map " + value + " -> " + mapped + "，线程 " + threadName());
+////                    return mapped;
+////                }) 象   source 是 ObservableEmitter <Integer> 对象
+////                                    //返回ObservableMap 实例， source是ObservableSubscribeOn 实例
+//                //.observeOn(Schedulers.computation())   //返回ObservableObserveOn  source是返回ObservableMap 实例
+//                .subscribe(new BaseObserver());
     }
 
     /**
